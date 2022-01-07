@@ -1,0 +1,134 @@
+---
+title: "Bellabeat Case Study"
+author: "Daniel Gonçalves"
+date: "01/07/2022"
+output:
+  html_document:
+---
+
+# Using Step Counts and Calory Counts to Guide a New Business Strategy for Bellabeat
+
+#### Bellabeat is a tech-driven company that creates fashionable wellness products for women. It was founded by Urška Sršen, who has a background in art and is the Chief Creative Officer, and Sando Mur, who has a background in mathematics and is a key member of the Bellabeat executive team.
+
+
+# Data Source:
+
+#### Data comes from the dataset FitBit Fitness Tracker Data, a CCO Public Domain Licensed dataset made available on Kaggle by the user Mobius. It contains data from thirty individuals who consented and submitted the data for their personal fitness trackers. 
+
+
+# Business Task: 
+
+#### Analyze data from Fitbit and find trends that can be applied to Bellabeat fitness tracking products to help guide a new marketing strategy.
+
+
+# Data Preparation and Processing
+### Before beginning in RStudio, I used Google Sheets to eliminate any null values in the .csv values that would ruin the data. The original files are still available upon request.
+
+#### Further steps could be taken to remove any rows with extremely low values, such as some that had less than 100 steps in a day, as these were almost certainly instances where the fitness tracker was not worn.
+
+## Install necessary packages 
+
+
+
+```{r}
+library(tidyverse)
+library(readr)
+library(ggplot2)
+```
+
+
+
+# Data Organization and Aggregation
+
+### Then, import necesarry .csv files.
+
+#### For this presentation, I've only used cleaned versions of daily step counts, daily calory counts, and daily activity data. I've also changed the names of the files for ease of use and readability
+
+
+```{r}
+clean_daily_calories <- read_csv("~/Desktop/Data Analysis/Fitbit/Bellabeat - copy_daily_calories.csv")
+
+clean_daily_steps <- read_csv("~/Desktop/Data Analysis/Fitbit/Bellabeat - copy_daily_steps.csv")
+```
+
+
+### After importing, it is necessary to check the files for errors. I do this with the View() and glimpse() functions.
+
+```{r}
+glimpse(clean_daily_calories)
+```
+
+```{r}
+glimpse(clean_daily_steps)
+```
+
+
+
+## Joining Data
+ 
+### Next, I joined clean daily_steps_data and the clean_daily_calories data into the same table and named it daily_calories_steps
+ 
+```{r}
+daily_calories_steps <- inner_join(clean_daily_calories, clean_daily_steps)
+```
+
+### Use glimpse() to check the new table
+
+```{r}
+glimpse(daily_calories_steps)
+```
+
+
+# Data Analysis
+
+## Averages
+
+#### We will use the averages from each individual's data to find trends.
+
+```{r}
+mean_steps_calories <- daily_calories_steps %>%
+  group_by(Id) %>%
+  summarize(mean_calories = mean(Calories), mean_steps = mean(StepTotal))
+```
+
+```{r}
+glimpse(mean_steps_calories)
+```
+
+### Now, each individual Id has an average step count and average calorie count.
+
+
+
+# Visualizations
+
+### We will create a visualization using the data acquired.
+
+```{r}
+ggplot(data = mean_steps_calories) + 
+  geom_point(mapping = aes(x = mean_steps, y = mean_calories, color = Id)) +
+  geom_smooth(mapping = aes(x = mean_steps, y = mean_calories, color = Id))
+```
+
+
+
+# Conclusions
+
+### With the exception of the outlier with less than 2,000 steps (furthest to the left, can possibly be explained by removing the fitness tracker) there is a clear upward trend. Most people would have guessed that, but there are also important thresholds.
+
+## Threshold One: 5,000 steps
+
+### There's a significant increase in average calories burned once customers surpassed around 5,000 steps. from 5,000 steps to 8,000 steps, we see a 25% increase in calories burned (2500 from 2000).
+
+## Threshold Two: 8,000 steps
+
+### Once participants reached 8,000 steps, the amount of calories burned seems to level out until around 12,000 average steps, where we see another steady incline into a few outliers who may have been endurance athletes or runners.
+
+
+
+# Business Strategy
+
+### Bellabeat has made a profound name for itself over the past five years of incredible growth. One of the standout features of the company, aside from its focus on women, is its beautiful and creative designs —a clear and lovely result of Urška Sršen's background in art. We can couple that physical beauty with the beauty of math and numbers—Mur's background. Marketing the product as one that is not only physically beautiful, but technologically and mathematically accurate and beautiful, will increase trust in the product and also target future users who may be more analytic/mathematic-minded.
+
+### The way to do this, according to the data, is to advertise these step thresholds as mathematical standards for calorie burning. Bellabeat could advertise its membership subscription by offering more data to the consumer, and by offering push notifications and reminders that would motivate users to reach the threshold of at least 5,000 steps a day, and to reward them if they reach 8,000.
+
+### It should be assumed that Bellabeat customers, like most fitness tracking customers, want to not only keep track of their fitness trends and indicators, but also understand how to best yield the outcomes they desire. Setting certain step milestones for users, and showing the data of why those milestones matter, will make the customers believe in the product more, and believe in the science more, potentially yielding a healthier, happier, customer base.
